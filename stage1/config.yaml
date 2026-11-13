@@ -1,0 +1,55 @@
+# Stage 1: GENERAL-knowledge distillation. A random-init BERT-mini learns language from MLM + a frozen bert-base-uncased.
+# General text only (Wikipedia). The teacher is never trained and never sees ASRS.
+# Plain-MLM control (ablation):  --set objective=mlm --set out_dir=runs/stage1_mlm
+run_name: stage1_distill
+objective: distill              # distill | mlm
+teacher: bert-base-uncased
+tokenizer: bert-base-uncased
+mlm_prob: 0.15
+seed: 42
+out_dir: runs/stage1_distill
+init_from: null                 # folder or Hub id of a BertForMaskedLM to start from (null = random init)
+
+data:
+  train_dir: data/text/wiki/train
+  val_dir: data/text/wiki/validation
+  eval_blocks: 5000
+
+student:                        # BERT-mini: 4 layers, hidden 256, 4 heads (about 11.1M parameters)
+  vocab_size: 30522
+  hidden_size: 256
+  num_layers: 4
+  num_heads: 4
+  intermediate_size: 1024
+  max_positions: 256
+
+loss:
+  mlm: 1.0
+  kd_logits: 2.0                # KL to the teacher's masked-token distribution
+  hidden: 1.0                   # relation distillation, student layers 1-4 <-> teacher layers 3, 6, 9, 12
+  rel_tau: 0.1
+  attn: 0.0                     # set 0.5 later if you want; needs eager attention (slower, ~2 GB more):
+                                #   also set args.per_device_train_batch_size=32 args.gradient_accumulation_steps=4
+  temperature: 2.0
+
+# Passed straight to transformers.TrainingArguments (standard Hugging Face names).
+args:
+  per_device_train_batch_size: 32     # optimal for 6 GB VRAM on RTX 3050 laptop
+  per_device_eval_batch_size: 32
+  gradient_accumulation_steps: 4      # effective batch = 32 * 4 = 128 sequences
+  max_steps: 7800                     # about 1.0M blocks (256M tokens) at batch 128
+  learning_rate: 6.0e-4
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+  adam_beta2: 0.98
+  adam_epsilon: 1.0e-6
+  max_grad_norm: 1.0
+  bf16: true                          # RTX 3050 (Ampere) natively supports bf16
+  dataloader_num_workers: 0           # 0 is recommended on Windows to avoid process spawning/RAM overhead
+  logging_steps: 50
+  eval_strategy: steps
+  eval_steps: 500
+  save_strategy: steps
+  save_steps: 1000
+  save_total_limit: 2
