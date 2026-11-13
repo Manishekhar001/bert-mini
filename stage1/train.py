@@ -61,8 +61,8 @@ def main():
     evals = {'general' : load_from_disk(cfg['data']['val_dir'])}
     evals = {k: v.select(range(min(n_eval, len(v)))) for k, v in evals.items()}
 
-    if args.overfit():
-        train = train.select(range(2*int(cfg['args']['per_device_train_batch_sie'])))
+    if args.overfit:
+        train = train.select(range(2*int(cfg['args']['per_device_train_batch_size'])))
 
         cfg['args'].update(max_steps = 200, logging_steps = 10, eval_steps = 100, save_steps = 200)
 

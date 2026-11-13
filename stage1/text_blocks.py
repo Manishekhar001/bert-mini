@@ -27,7 +27,7 @@ class Packer :
 
         for ids in enc:
             self.buf.extend(ids)
-            self.buf.extend(self.sep)
+            self.buf.append(self.sep)
 
         n = len(self.buf) // self.body
 

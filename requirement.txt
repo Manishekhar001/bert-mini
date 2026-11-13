@@ -1,7 +1,10 @@
 # Supported runtime: Python 3.10-3.12 (Python 3.12 recommended, especially on Windows).
-# Install a PyTorch wheel matching your OS/CUDA driver using https://pytorch.org/get-started/locally/
-# Then install the remaining project dependencies with: python -m pip install -r requirements.txt
+# Prefer the official CUDA 12.6 PyTorch wheels for the Windows/NVIDIA training setup.
+# uv checks this extra index before PyPI; PyPI supplies the rest of the project packages.
+# Install with: uv pip install --python .venv\Scripts\python.exe -r requirements.txt
 # Transformers v5 is intentionally excluded until the project is migrated and its Trainer paths are verified.
+
+--extra-index-url https://download.pytorch.org/whl/cu126
 
 # Training and Hugging Face integration
 torch>=2.3,<3.0
@@ -11,14 +14,11 @@ huggingface_hub>=0.24,<1.0
 datasets>=2.20,<5.0
 safetensors>=0.4,<1.0
 
-# Data preparation, metrics, calibration, and plots
+# Data preparation, metrics, and calibration
 numpy>=1.26,<3.0
-pandas>=2.0,<4.0
 scipy>=1.11,<2.0
 scikit-learn>=1.3,<2.0
-matplotlib>=3.8,<4.0
 pyyaml>=6.0,<7.0
-tqdm>=4.66,<5.0
 
 # ONNX export and inference
 onnx>=1.16,<2.0

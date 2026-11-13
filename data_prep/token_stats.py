@@ -1,4 +1,4 @@
-"""How much of the ASRS data fits in the context window? Run after data_prep/prepare_asrs.py.
+"""How much of the ASRS data fits in the context window? Run after data_prep/asrs_prep.py.
 
     python data_prep/token_stats.py
     python data_prep/token_stats.py --lengths 256 384 512
@@ -28,7 +28,7 @@ def main():
     tok.model_max_length = 10 ** 7
     rows = read_jsonl(Path(args.data_dir) / "train.jsonl")
     if not rows:
-        raise SystemExit("No training reports found. Run python data_prep/prepare_asrs.py first.")
+        raise SystemExit("No training reports found. Run python data_prep/asrs_prep.py first.")
     if any(length < 2 for length in args.lengths):
         raise SystemExit("Every requested length must leave room for [CLS] and [SEP] (minimum 2).")
     texts = [r["text"] for r in rows]

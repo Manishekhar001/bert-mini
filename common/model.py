@@ -8,7 +8,7 @@ import torch.nn as nn
 from transformers import AutoModel, BertConfig, BertForMaskedLM, BertModel
 
 
-def student_config(s: dict, attn_impl: str | None = None) -> BertConfig:
+def student_config(s: dict) -> BertConfig:
     """BERT-mini by default: 4 layers, hidden 256, 4 heads, FFN 1024, 256 positions (~11.1M parameters)."""
     cfg = BertConfig(
         vocab_size=s.get("vocab_size", 30522),
@@ -21,19 +21,16 @@ def student_config(s: dict, attn_impl: str | None = None) -> BertConfig:
         hidden_dropout_prob=0.1,
         attention_probs_dropout_prob=0.1,
     )
-    if attn_impl:
-        cfg._attn_implementation = attn_impl        # 'eager' is required to read attention maps
     return cfg
 
 
-def build_student_mlm(s: dict, attn_impl: str | None = None) -> BertForMaskedLM:
-    return BertForMaskedLM(student_config(s, attn_impl))      # random weights: "from scratch"
+def build_student_mlm(s: dict) -> BertForMaskedLM:
+    return BertForMaskedLM(student_config(s))      # random weights: "from scratch"
 
 
-def load_student_mlm(path_or_name, attn_impl: str | None = None) -> BertForMaskedLM:
+def load_student_mlm(path_or_name) -> BertForMaskedLM:
     """Load a student saved with save_pretrained (a folder) or any BertForMaskedLM on the Hub. Always fp32."""
-    kw = {"attn_implementation": attn_impl} if attn_impl else {}
-    return BertForMaskedLM.from_pretrained(str(path_or_name), **kw).float()
+    return BertForMaskedLM.from_pretrained(str(path_or_name)).float()
 
 
 def extend_positions(model, new_max: int, mode: str = "smooth"):

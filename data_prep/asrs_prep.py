@@ -1,7 +1,7 @@
 """Download and normalize the project's single-label Hugging Face dataset.
 
 Run from the project root:
-    python data_prep/prepare_asrs.py
+    python data_prep/asrs_prep.py
 
 Writes train/validation/test JSONL files and the label-id-to-name mapping under data/asrs/.
 """

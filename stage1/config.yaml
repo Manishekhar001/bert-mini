@@ -28,8 +28,6 @@ loss:
   kd_logits: 2.0                # KL to the teacher's masked-token distribution
   hidden: 1.0                   # relation distillation, student layers 1-4 <-> teacher layers 3, 6, 9, 12
   rel_tau: 0.1
-  attn: 0.0                     # set 0.5 later if you want; needs eager attention (slower, ~2 GB more):
-                                #   also set args.per_device_train_batch_size=32 args.gradient_accumulation_steps=4
   temperature: 2.0
 
 # Passed straight to transformers.TrainingArguments (standard Hugging Face names).
