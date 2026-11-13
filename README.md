@@ -83,10 +83,10 @@ uv run python data_prep/token_stats.py --lengths 256 384 512
 
 ## 3. Stage 1: learn general language patterns
 
-Build the general-English token blocks. The default downloads Wikipedia and writes one million 256-token training blocks plus a validation set. The optional ASRS validation blocks are for monitoring only; they are not used to train the model.
+Build the general-English token blocks. This downloads Wikipedia and writes one million 256-token training blocks plus a validation set. Stage 1 loads only this general-English corpus; ASRS reports are first used in Stage 2.
 
 ```powershell
-uv run python stage1/build_corpus.py --out data/text/wiki --asrs_val_dir data/asrs
+uv run python stage1/build_corpus.py --out data/text/wiki
 ```
 
 Train the small model with masked-language modeling and teacher guidance:
@@ -94,6 +94,8 @@ Train the small model with masked-language modeling and teacher guidance:
 ```powershell
 uv run python stage1/train.py
 ```
+
+Stage 1 combines masked-token prediction loss, teacher logit-KL loss, and relation-KL loss between matched student and teacher layers. BERT's normal self-attention remains part of every encoder layer; the project does not add a separate loss that matches the teacher's attention maps.
 
 The standard output is `runs/stage1_distill/final/`. Add `--resume` to continue from the latest checkpoint in that run folder. To do a short pipeline sanity check, use `uv run python stage1/train.py --overfit`; this deliberately trains on only a few blocks and is not a useful final model.
 
