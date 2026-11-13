@@ -1,0 +1,43 @@
+# Stage 2: domain-adaptive MLM on ASRS narratives. Student only, no teacher.
+run_name: stage2_domain
+tokenizer: bert-base-uncased
+init_from: runs/stage1_distill/final
+out_dir: runs/stage2_domain
+mlm_prob: 0.15
+seed: 42
+max_len: 512                    # positions are extended from 256 to this; ASRS narratives average about 281 tokens
+head_tokens: 384                # reports longer than max_len keep the first 384 and the last tokens
+
+# Stage 2 trains query/value LoRA adapters plus the position-embedding table. The other pretrained
+# MLM/encoder weights stay frozen. The final adapters are merged into the ordinary BERT weights.
+use_lora: true
+lora_r: 8
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target_modules: [query, value]
+
+data:
+  general_val_dir: data/text/wiki/validation      # optional forgetting check; remove the line to skip
+
+# Passed straight to transformers.TrainingArguments.
+args:
+  per_device_train_batch_size: 16     # micro-batch to reduce 512-token MLM peak memory on a 6 GB GPU
+  per_device_eval_batch_size: 16
+  gradient_accumulation_steps: 4      # effective batch = 16 * 4 = 64 reports
+  num_train_epochs: 15                # the best epoch by ASRS validation loss is kept
+  learning_rate: 2.0e-4
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.06
+  weight_decay: 0.01
+  adam_beta2: 0.98
+  adam_epsilon: 1.0e-6
+  max_grad_norm: 1.0
+  bf16: true
+  dataloader_num_workers: 0           # Windows stability
+  logging_steps: 50
+  eval_strategy: epoch
+  save_strategy: epoch
+  save_total_limit: 2
+  load_best_model_at_end: true
+  metric_for_best_model: asrs_val_mlm
+  greater_is_better: false
