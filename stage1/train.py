@@ -8,6 +8,14 @@
 Built on Hugging Face Trainer (checkpointing, resume, logging, mixed precision). Output: <out_dir>/final (a normal
 save_pretrained folder, loadable with BertForMaskedLM.from_pretrained) + the tokenizer.
 """
+
+# Continue for about one more pass from the completed Stage 1 model.
+# This starts a new optimizer schedule and writes to a separate run folder.
+# uv run python stage1/train.py --set init_from=runs/stage1_distill/final --set out_dir=runs/stage1_distill_epoch2 --set seed=43 --set args.max_steps=7800 --set args.learning_rate=1.0e-4
+# Then start Stage 2 from the continued Stage 1 model:
+# uv run python stage2/train.py --init runs/stage1_distill_epoch2/final
+
+
 import argparse
 import sys
 from pathlib import Path
