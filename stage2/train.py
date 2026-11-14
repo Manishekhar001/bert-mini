@@ -71,7 +71,7 @@ def main():
             r = int(cfg.get("lora_r",8)),
             alpha = float(cfg.get("lora_alpha" , 16.0)),
             dropout = float(cfg.get("lora_dropout" , 0.05)),
-            target_models = tuple(cfg.get("lora_target_modules", ["query" , 'value']))
+            target_modules=tuple(cfg.get("lora_target_modules", ["query", "value"]))
         )
     else:
         for parameter in student.parameters():
