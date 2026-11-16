@@ -222,7 +222,7 @@ wheels = [
 ]
 
 [[package]]
-name = "bert-mini-jev"
+name = "bert-mini"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
