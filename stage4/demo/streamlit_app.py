@@ -10,13 +10,13 @@ import streamlit as st
 
 from stage4.inference import Predictor
 
-MODEL_DIR = os.environ.get("MINIJEV_DIR", "artifacts/final")
-BACKEND = os.environ.get("MINIJEV_BACKEND", "onnx_int8")
+MODEL_DIR = os.environ.get("BERTMINI_DIR", "artifacts/final")
+BACKEND = os.environ.get("BERTMINI_BACKEND", "onnx_int8")
 
-st.set_page_config(page_title="Mini Jev: ASRS triage", layout="wide")
-st.title("Mini Jev: aviation safety report triage")
+st.set_page_config(page_title="bert-mini: ASRS triage", layout="wide")
+st.title("bert-mini: aviation safety report triage")
 st.caption("A distilled BERT-mini chooses one of the dataset's 18 report categories. "
-           "Learning project: not for real safety decisions.")
+           "Not for real safety decisions.")
 
 
 @st.cache_resource

@@ -1,8 +1,8 @@
-"""Mini Jev ASRS report classifier in Hugging Face format (self-contained; needs only torch and transformers).
+"""bert-mini ASRS report classifier in Hugging Face format (self-contained; needs only torch and transformers).
 
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
     model = AutoModelForSequenceClassification.from_pretrained(repo, trust_remote_code=True)
-    tokenizer = AutoTokenizer.from_pretrained(repo)
+    tokenizer = AutoTokenizer.from_pretrained(repo, trust_remote_code=True)
     model.classify(["narrative text ..."], tokenizer)
 
 `classify` repeats the project's own pipeline: head + tail truncation, the per-class prior correction, temperature
@@ -13,7 +13,7 @@ import torch.nn as nn
 from transformers import BertModel, PreTrainedModel
 from transformers.modeling_outputs import SequenceClassifierOutput
 
-from .configuration_minijev import MiniJevConfig
+from .configuration_bertmini import BertMiniConfig
 
 
 class AttentivePooler(nn.Module):
@@ -39,8 +39,8 @@ def head_tail_ids(ids, cls_id, sep_id, max_len, head_tokens):
     return [cls_id] + ids + [sep_id]
 
 
-class MiniJevForSequenceClassification(PreTrainedModel):
-    config_class = MiniJevConfig
+class BertMiniForSequenceClassification(PreTrainedModel):
+    config_class = BertMiniConfig
     base_model_prefix = "encoder"
 
     def __init__(self, config):

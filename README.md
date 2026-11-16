@@ -42,7 +42,7 @@ The training split is rebalanced, but the validation and test splits keep the na
 
 ## How the project runs
 
-Run commands from the project folder, `D:\A\BERT_MINI_JEV`.
+Run commands from the project's root folder.
 
 | Step | What it does | Main output |
 | --- | --- | --- |
@@ -224,7 +224,7 @@ The response includes the chosen category, its confidence, probabilities for all
 uv run streamlit run stage4/demo/streamlit_app.py
 ```
 
-The service looks for `artifacts/final` by default. To select another package or backend in PowerShell, set `MINIJEV_DIR` or `MINIJEV_BACKEND` before starting it. Backends are `torch`, `onnx`, and `onnx_int8`.
+The service looks for `artifacts/final` by default. To select another package or backend in PowerShell, set `BERTMINI_DIR` or `BERTMINI_BACKEND` before starting it. Backends are `torch`, `onnx`, and `onnx_int8`.
 
 ## 8. Export to Hugging Face format and publish
 
@@ -234,7 +234,7 @@ Stage 4's `model.pt` is the project's own format. To get a standard Hugging Face
 uv run python stage4/export_hf.py
 ```
 
-This writes `artifacts/hf_model/` and then reloads it the way a Hub user would, checking that its answers match the packaged model. The classifier has an attention-pooling head, so it is not a stock `BertForSequenceClassification`. The folder therefore includes two small Python files (`configuration_minijev.py`, `modeling_minijev.py`) that define the model, and loading requires `trust_remote_code=True`. The calibration settings travel inside `config.json`, and `model.classify(...)` applies them.
+This writes `artifacts/hf_model/` and then reloads it the way a Hub user would, checking that its answers match the packaged model. The classifier has an attention-pooling head, so it is not a stock `BertForSequenceClassification`. The folder therefore includes two small Python files (`configuration_bertmini.py`, `modeling_bertmini.py`) that define the model, and loading requires `trust_remote_code=True`. The calibration settings travel inside `config.json`, and `model.classify(...)` applies them.
 
 Publish it (repos are private unless you add `--public`):
 

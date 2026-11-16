@@ -2,7 +2,7 @@
 
     python stage4/export_hf.py
     python stage4/push_to_hub.py --what hf_model --path artifacts/hf_model --repo mini-bert-asrs
-    python stage4/push_to_hub.py --what encoder --path runs/stage2_domain/final --repo mini-jev-asrs-mlm
+    python stage4/push_to_hub.py --what encoder --path runs/stage2_domain/final --repo bert-mini-asrs-mlm
 
 hf_model   : the standard Hugging Face model folder made by stage4/export_hf.py (config.json, model.safetensors,
              tokenizer, model code, model card). Load it with AutoModelForSequenceClassification (trust_remote_code).
@@ -63,7 +63,7 @@ def main():
     if not folder.is_dir():
         raise SystemExit(f"{folder} is not a folder")
     if args.what == "hf_model":
-        needed = ["config.json", "model.safetensors", "modeling_minijev.py", "configuration_minijev.py"]
+        needed = ["config.json", "model.safetensors", "modeling_bertmini.py", "configuration_bertmini.py"]
         absent = [item for item in needed if not (folder / item).exists()]
         if absent:
             raise SystemExit(f"{folder} is not a Hugging Face model folder (missing {absent}). "

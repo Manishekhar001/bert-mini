@@ -16,7 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-CODE_FILES = ("configuration_minijev.py", "modeling_minijev.py")
+CODE_FILES = ("configuration_bertmini.py", "modeling_bertmini.py")
 
 CARD = """---
 language: en
@@ -51,7 +51,7 @@ print(result["label"], result["confidence"], result["needs_review"])
 ```
 
 `trust_remote_code=True` is required because the model uses attention pooling, which is not part of the stock BERT
-classifier. The code is the two small files `configuration_minijev.py` and `modeling_minijev.py` in this repository;
+classifier. The code is the two small files `configuration_bertmini.py` and `modeling_bertmini.py` in this repository;
 read them before running.
 
 `model.classify(...)` applies the same steps as the original project: keeps the first {head_tokens} and the last
@@ -122,8 +122,8 @@ def main():
     from common.model import load_classifier
     from common.schema import Schema
     from common.utils import read_json, read_jsonl
-    from stage4.hf.configuration_minijev import MiniJevConfig
-    from stage4.hf.modeling_minijev import MiniJevForSequenceClassification
+    from stage4.hf.configuration_bertmini import BertMiniConfig
+    from stage4.hf.modeling_bertmini import BertMiniForSequenceClassification
     from stage4.inference import Predictor
 
     src, out = Path(args.dir), Path(args.out)
@@ -134,7 +134,7 @@ def main():
     enc = source.encoder.config
     data_cfg = cal.get("data_cfg", {})
 
-    config = MiniJevConfig(
+    config = BertMiniConfig(
         vocab_size=enc.vocab_size, hidden_size=enc.hidden_size, num_hidden_layers=enc.num_hidden_layers,
         num_attention_heads=enc.num_attention_heads, intermediate_size=enc.intermediate_size,
         hidden_act=enc.hidden_act, hidden_dropout_prob=enc.hidden_dropout_prob,
@@ -146,11 +146,11 @@ def main():
         calibration_temperature=cal.get("temperature", 1.0), class_bias=cal.get("class_bias"),
         confidence_threshold=cal.get("confidence_threshold"), ood=cal.get("ood"),
         id2label=dict(enumerate(schema.classes)), label2id={name: i for i, name in enumerate(schema.classes)},
-        architectures=["MiniJevForSequenceClassification"],
+        architectures=["BertMiniForSequenceClassification"],
     )
-    config.auto_map = {"AutoConfig": "configuration_minijev.MiniJevConfig",
-                       "AutoModelForSequenceClassification": "modeling_minijev.MiniJevForSequenceClassification"}
-    model = MiniJevForSequenceClassification(config)
+    config.auto_map = {"AutoConfig": "configuration_bertmini.BertMiniConfig",
+                       "AutoModelForSequenceClassification": "modeling_bertmini.BertMiniForSequenceClassification"}
+    model = BertMiniForSequenceClassification(config)
     missing, unexpected = model.load_state_dict(source.state_dict(), strict=False)
     unexpected = [key for key in unexpected if not key.endswith("position_ids")]
     if missing or unexpected:

@@ -1,11 +1,11 @@
-"""Configuration for the Mini Jev ASRS report classifier (Hugging Face format).
+"""Configuration for the bert-mini ASRS report classifier (Hugging Face format).
 
 This file is self-contained on purpose: it is copied next to the weights and loaded with trust_remote_code=True.
 """
 from transformers import BertConfig
 
 
-class MiniJevConfig(BertConfig):
+class BertMiniConfig(BertConfig):
     """A BERT-mini encoder plus attention pooling and one output layer.
 
     Extra fields describe how the project uses the model:
@@ -17,7 +17,7 @@ class MiniJevConfig(BertConfig):
     Names avoid "temperature" because Transformers reserves it for text generation settings.
     """
 
-    model_type = "minijev"
+    model_type = "bertmini"
 
     def __init__(self, pooling="attn", classifier_dropout=0.1, report_max_len=512, report_head_tokens=384,
                  calibration_temperature=1.0, class_bias=None, confidence_threshold=None, ood=None, **kwargs):

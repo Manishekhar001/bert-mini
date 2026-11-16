@@ -1,7 +1,7 @@
 """FastAPI service: send reports and receive one calibrated class prediction per report.
 
     uvicorn stage4.serve.app:app --port 8000
-    MINIJEV_BACKEND=onnx_int8 MINIJEV_DIR=artifacts/final uvicorn stage4.serve.app:app --port 8000
+    BERTMINI_BACKEND=onnx_int8 BERTMINI_DIR=artifacts/final uvicorn stage4.serve.app:app --port 8000
 
     curl -X POST localhost:8000/predict -H "Content-Type: application/json" \
          -d '{"texts": ["On final approach we received a TCAS RA and executed a go-around ..."]}'
@@ -19,9 +19,9 @@ from pydantic import BaseModel, Field
 
 from stage4.inference import Predictor
 
-MODEL_DIR = os.environ.get("MINIJEV_DIR", "artifacts/final")
-BACKEND = os.environ.get("MINIJEV_BACKEND", "onnx_int8")      # torch | onnx | onnx_int8
-THREADS = int(os.environ.get("MINIJEV_THREADS", "4"))
+MODEL_DIR = os.environ.get("BERTMINI_DIR", "artifacts/final")
+BACKEND = os.environ.get("BERTMINI_BACKEND", "onnx_int8")      # torch | onnx | onnx_int8
+THREADS = int(os.environ.get("BERTMINI_THREADS", "4"))
 _state = {}
 
 
@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
     _state.clear()
 
 
-app = FastAPI(title="Mini Jev: ASRS report triage", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="bert-mini: ASRS report triage", version="0.1.0", lifespan=lifespan)
 
 
 class PredictRequest(BaseModel):
