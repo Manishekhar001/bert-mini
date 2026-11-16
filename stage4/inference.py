@@ -8,7 +8,7 @@ import numpy as np
 from common.schema import Schema
 from common.text_utils import pad_batch, tokenize_texts
 from common.utils import read_json
-from stage4.calibration import calibrated_probs, domain_score
+from stage4.calibration import apply_bias, calibrated_probs, domain_score
 
 
 def torch_logits_for_texts(model, tokenizer, texts, device, max_len: int = 256, head_tokens: int = 192,
@@ -97,6 +97,7 @@ class Predictor:
         if not texts:
             return []
         logits = self.logits(texts)
+        logits = apply_bias(logits, self.cal.get("class_bias"))     # per-class prior correction fitted on validation
         probs = calibrated_probs(logits, self.cal.get("temperature", 1.0))
         ood = self.cal.get("ood")
         scores = domain_score(ood["score"], logits, probs) if ood else None

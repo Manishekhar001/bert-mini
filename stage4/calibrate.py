@@ -15,7 +15,8 @@ from common.dataset import AsrsDataset
 from common.metrics import auroc, evaluate, logits_to_probs, reliability_bins
 from common.schema import Schema
 from common.utils import get_device, read_json, read_jsonl, write_json
-from stage4.calibration import calibrated_probs, domain_score, fit_temperature, threshold_for_accuracy
+from stage4.calibration import (apply_bias, calibrated_probs, choose_bias_strength, domain_score, fit_class_bias,
+                                fit_temperature, threshold_for_accuracy)
 from stage4.inference import torch_logits_for_texts
 
 
@@ -53,6 +54,10 @@ def main():
     parser.add_argument("--ood_file", default=None, help="optional newline-separated outside-domain texts")
     parser.add_argument("--ood_n", type=int, default=2000)
     parser.add_argument("--no_ood", action="store_true")
+    parser.add_argument("--no_bias", action="store_true",
+                        help="skip the per-class prior correction (see stage4/calibration.py)")
+    parser.add_argument("--bias_l2", type=float, default=1e-2,
+                        help="L2 penalty that keeps rare-class offsets small")
     parser.add_argument("--tokenizer", default=None)
     args = parser.parse_args()
 
@@ -70,8 +75,27 @@ def main():
                       data_cfg["max_len"], data_cfg["head_tokens"])
     test = AsrsDataset(read_jsonl(data_dir / "test.jsonl"), schema, tokenizer,
                        data_cfg["max_len"], data_cfg["head_tokens"])
-    val_logits = np.load(run / "logits_val.npz")["logits"]
-    test_logits = np.load(run / "logits_test.npz")["logits"]
+    raw_val_logits = np.load(run / "logits_val.npz")["logits"]
+    raw_test_logits = np.load(run / "logits_test.npz")["logits"]
+
+    # 0) Prior correction. Training data is rebalanced, validation/test keep the natural class mix, so a per-class
+    #    offset fitted on validation puts the model's class frequencies back in line. How much of it to apply is
+    #    chosen by cross-validation inside the validation set; test is never used here.
+    class_bias, bias_report = None, {"applied": False}
+    if not args.no_bias:
+        strength, strength_table = choose_bias_strength(raw_val_logits, val.labels, l2=args.bias_l2)
+        bias_report = {"applied": strength > 0, "strength": strength, "l2": args.bias_l2,
+                       "cross_validation": strength_table}
+        if strength > 0:
+            class_bias = (strength * fit_class_bias(raw_val_logits, val.labels, args.bias_l2)).tolist()
+            bias_report["offsets"] = dict(zip(schema.classes, class_bias))
+    bias_report["before"] = evaluate(logits_to_probs(raw_test_logits), test.labels)
+    val_logits = apply_bias(raw_val_logits, class_bias)
+    test_logits = apply_bias(raw_test_logits, class_bias)
+    bias_report["after"] = evaluate(logits_to_probs(test_logits), test.labels)
+    print(f"prior correction: {'strength %.2f' % bias_report['strength'] if class_bias else 'not applied'}; "
+          f"test accuracy {bias_report['before']['accuracy']:.3f} -> {bias_report['after']['accuracy']:.3f}, "
+          f"macro-F1 {bias_report['before']['macro_f1']:.3f} -> {bias_report['after']['macro_f1']:.3f}")
 
     # 1) Temperature scaling adjusts the sharpness of probabilities without changing the winning class.
     temperature = fit_temperature(val_logits, val.labels)
@@ -93,6 +117,7 @@ def main():
 
     calibration = {
         "temperature": temperature,
+        "class_bias": class_bias,
         "target_accuracy": args.target_acc,
         "confidence_threshold": cutoff,
         "data_cfg": data_cfg,
@@ -100,6 +125,7 @@ def main():
     report = {
         "run": str(run),
         "temperature": temperature,
+        "class_bias": bias_report,
         "before_calibration": before,
         "after_calibration": after,
         "review": {
@@ -123,6 +149,7 @@ def main():
                 raise ValueError("the outside-domain text source returned no usable texts")
             ood_logits = torch_logits_for_texts(model, tokenizer, texts, device,
                                                 data_cfg["max_len"], data_cfg["head_tokens"])
+            ood_logits = apply_bias(ood_logits, class_bias)
             ood_probs = calibrated_probs(ood_logits, temperature)
             candidates = []
             for kind in ("confidence", "energy"):

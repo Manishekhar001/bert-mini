@@ -1,7 +1,7 @@
 [project]
-name = "bert-mini-jev"
+name = "bert-mini"
 version = "0.1.0"
-description = "Add your description here"
+description = "Compact BERT classifier for aviation safety reports (ASRS)"
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
 dependencies = [

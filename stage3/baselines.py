@@ -43,6 +43,9 @@ def main():
         logits = np.full((len(rows[split]), schema.n_classes), -20.0)
         logits[:, classifier.classes_] = np.log(np.clip(probabilities, 1e-12, 1.0))
         results[result_key] = evaluate(logits_to_probs(logits), labels[split])
+        # Saved so stage4/compare.py can apply the same prior correction to this baseline (a fair comparison).
+        Path(args.out).mkdir(parents=True, exist_ok=True)
+        np.savez(Path(args.out) / f"logits_{result_key}.npz", logits=logits.astype(np.float32))
     write_json(Path(args.out) / "metrics.json", results)
     print(f"TF-IDF test accuracy {results['test']['accuracy']:.4f}; macro-F1 {results['test']['macro_f1']:.4f}")
 
