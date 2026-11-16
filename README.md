@@ -6,15 +6,24 @@ The model does not answer a question written by the user. It reads a report and 
 
 ## Current results
 
-On the held-out test split (9,868 reports; always guessing the most common class scores 0.342 accuracy), taken from `results.md`:
+On the held-out test split (9,868 reports; always guessing the most common class scores 0.342 accuracy), taken from `results.md`. The best bert-mini run is `D_full_ft`: Stage 1 distillation, Stage 2 domain adaptation, Stage 3 full-encoder fine-tuning (`use_lora=false`), then Stage 4 prior correction and temperature scaling.
 
-| Model | Accuracy | Macro-F1 | Calibration error (ECE) |
-| --- | ---: | ---: | ---: |
-| TF-IDF + logistic regression | 0.600 | 0.313 | 0.106 |
-| bert-mini classifier (raw) | 0.555 | 0.264 | 0.033 |
-| bert-mini classifier + prior correction | 0.604 | 0.268 | 0.021 |
+| Model | Params | Accuracy | Macro-F1 | Calibration error (ECE) |
+| --- | ---: | ---: | ---: | ---: |
+| TF-IDF + logistic regression (raw) | - | 0.600 | 0.313 | 0.106 |
+| bert-mini `D_full_ft` (raw) | 11.2M | 0.591 | 0.288 | 0.044 |
+| **bert-mini `D_full_ft` + prior correction + temperature scaling** | 11.2M | **0.638** | **0.299** | **0.014** |
+| Reference: Google `bert_uncased_L-4_H-256_A-4`, same Stage 3 full fine-tune + prior correction | 11.2M | 0.638 | 0.294 | 0.017 |
+| Reference: bert-mini `C_distill_domain` (LoRA in Stage 3) + prior correction | 11.2M | 0.604 | 0.268 | 0.021 |
 
-The distilled model is much better calibrated than TF-IDF, but it does not yet beat TF-IDF on macro-F1, which is dominated by categories with few examples. `results.md` also has a per-class table, a confusion matrix, and CPU latency. Distillation is used **only in Stage 1 (pretraining)**; Stages 2, 3 and 4 never use a teacher.
+How to read this:
+
+- After correction, `D_full_ft` matches a fine-tuned off-the-shelf BERT-mini of the same size and has the lowest calibration error of all runs. The macro-F1 gap to the Google model (0.005) is within single-seed noise, so this is a tie, not a win. Before correction, the Google model is slightly ahead (0.597 accuracy, 0.295 macro-F1).
+- It does **not** beat TF-IDF on macro-F1 (0.299 vs 0.313), which is dominated by categories with few examples. TF-IDF was not given the prior correction, so its accuracy is not a like-for-like comparison with the corrected rows.
+- Full-encoder fine-tuning beat LoRA in Stage 3 (0.299 vs 0.268 macro-F1) from the same Stage 2 encoder.
+- Each result is from one training run (one seed). `results.md` has the full table of runs, a per-class table, a confusion matrix, and CPU latency.
+
+Distillation is used **only in Stage 1 (pretraining)**; Stages 2, 3 and 4 never use a teacher.
 
 ## Dataset format
 

@@ -16,3 +16,4 @@ docs/
 runs/
 
 artifacts/*
+pretrained/*
