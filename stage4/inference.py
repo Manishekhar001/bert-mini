@@ -1,4 +1,4 @@
-"""Predict one class for each report, with optional review and out-of-domain flags."""
+"""Predict one class for each report, with a human-review flag."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -8,7 +8,7 @@ import numpy as np
 from common.schema import Schema
 from common.text_utils import pad_batch, tokenize_texts
 from common.utils import read_json
-from stage4.calibration import apply_bias, calibrated_probs, domain_score
+from stage4.calibration import apply_bias, calibrated_probs
 
 
 def torch_logits_for_texts(model, tokenizer, texts, device, max_len: int = 256, head_tokens: int = 192,
@@ -99,8 +99,6 @@ class Predictor:
         logits = self.logits(texts)
         logits = apply_bias(logits, self.cal.get("class_bias"))     # per-class prior correction fitted on validation
         probs = calibrated_probs(logits, self.cal.get("temperature", 1.0))
-        ood = self.cal.get("ood")
-        scores = domain_score(ood["score"], logits, probs) if ood else None
         results = []
         for i, probabilities in enumerate(probs):
             class_id = int(probabilities.argmax())
@@ -109,9 +107,6 @@ class Predictor:
             cutoff = self.cal.get("confidence_threshold")
             if cutoff is None or confidence < float(cutoff):
                 reasons.append("low_confidence")
-            is_ood = bool(ood and scores[i] < float(ood["threshold"]))
-            if is_ood:
-                reasons.append("out_of_domain")
             results.append({
                 "label": self.schema.classes[class_id],
                 "label_id": class_id,
@@ -120,6 +115,5 @@ class Predictor:
                                   for name, probability in zip(self.schema.classes, probabilities)},
                 "needs_review": bool(reasons),
                 "review_reasons": reasons,
-                "out_of_domain": is_ood,
             })
         return results

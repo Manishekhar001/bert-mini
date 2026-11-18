@@ -75,16 +75,3 @@ def evaluate(probs, labels) -> dict:
         "nll": float(nll),
         "ece": ece(confidence, predictions == labels),
     }
-
-
-def auroc(in_domain_scores, outside_scores) -> float:
-    """Probability an in-domain score is higher than an outside score (ties count half)."""
-    from scipy.stats import rankdata
-
-    inside = np.asarray(in_domain_scores, dtype=np.float64)
-    outside = np.asarray(outside_scores, dtype=np.float64)
-    if len(inside) == 0 or len(outside) == 0:
-        return float("nan")
-    ranks = rankdata(np.concatenate([inside, outside]))
-    n_in, n_out = len(inside), len(outside)
-    return float((ranks[:n_in].sum() - n_in * (n_in + 1) / 2) / (n_in * n_out))

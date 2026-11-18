@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 
 from stage4.inference import Predictor
 
-MODEL_DIR = os.environ.get("BERTMINI_DIR", "artifacts/final")
+MODEL_DIR = os.environ.get("BERTMINI_DIR", "artifacts/final_pretrained")
 BACKEND = os.environ.get("BERTMINI_BACKEND", "onnx_int8")      # torch | onnx | onnx_int8
 THREADS = int(os.environ.get("BERTMINI_THREADS", "4"))
 _state = {}

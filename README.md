@@ -185,16 +185,10 @@ uv run python stage3/baselines.py
 
 First, Stage 4 fits a **per-class prior correction**: one adder per category, fitted on validation reports, that moves the model's class frequencies from the rebalanced training mix toward the natural mix. How much of the correction to apply (0 to 100%) is chosen by cross-validation inside the validation set, so the test split stays untouched. The offsets are saved as `class_bias` in `calibration.json` and applied automatically by `stage4/inference.py`. Add `--no_bias` to skip this step.
 
-Then temperature calibration and the confidence cutoff are fitted on validation reports. A prediction below the cutoff is marked for human review. By default, Stage 4 also compares confidence and energy scores against outside-domain Wikipedia text, keeps whichever score better separates the two validation samples, and saves a low-score boundary. This is a warning based on model scores, not proof that a report is or is not about aviation.
+Then temperature calibration and the confidence cutoff are fitted on validation reports. A prediction below the cutoff is marked for human review.
 
 ```powershell
 uv run python stage4/calibrate.py --run runs/C_distill_domain --out artifacts/final
-```
-
-To skip the optional outside-domain download and warning:
-
-```powershell
-uv run python stage4/calibrate.py --run runs/C_distill_domain --out artifacts/final --no_ood
 ```
 
 The package contains `model.pt`, the tokenizer, the class-name mapping, calibration settings (including the prior-correction offsets), and a report of validation/test metrics. Test results are for evaluation; they are not used to fit the calibration settings.

@@ -23,28 +23,28 @@ Always guessing the most common class scores 0.342 accuracy on this test set. Va
 
 Strength 1.00 applies the whole fitted correction and 0.00 none; it is chosen by cross-validation inside the validation set. The blend row mixes two models' log-probabilities and is not part of the packaged model.
 
-## Per-class test results: packaged model (C_distill_domain)
+## Per-class test results: packaged model (D_full_ft)
 
 | class | test reports | precision | recall | F1 | most often mistaken for |
 | --- | ---: | ---: | ---: | ---: | --- |
-| humanfactors | 3371 | 0.63 | 0.56 | 0.59 | procedure (362) |
-| aircraft | 3309 | 0.80 | 0.80 | 0.80 | humanfactors (261) |
-| procedure | 967 | 0.24 | 0.20 | 0.22 | humanfactors (385) |
-| ambiguous | 796 | 0.34 | 0.18 | 0.23 | humanfactors (228) |
-| weather | 329 | 0.43 | 0.75 | 0.55 | humanfactors (33) |
-| airport | 244 | 0.42 | 0.35 | 0.38 | humanfactors (65) |
-| environment-nonweatherrelated | 238 | 0.19 | 0.20 | 0.20 | humanfactors (60) |
-| chartorpublication | 134 | 0.40 | 0.55 | 0.46 | procedure (16) |
-| airspacestructure | 129 | 0.18 | 0.41 | 0.25 | humanfactors (42) |
-| atcequipment/navfacility/buildings | 126 | 0.21 | 0.33 | 0.26 | environment-nonweatherrelated (22) |
-| softwareandautomation | 68 | 0.09 | 0.04 | 0.06 | humanfactors (13) |
-| companypolicy | 53 | 0.07 | 0.28 | 0.11 | humanfactors (8) |
-| equipment/tooling | 38 | 0.09 | 0.26 | 0.13 | humanfactors (11) |
-| mel | 24 | 0.13 | 0.46 | 0.20 | aircraft (8) |
-| incorrect/notinstalled/unavailablepart | 19 | 0.07 | 0.21 | 0.11 | aircraft (5) |
-| staffing | 11 | 0.08 | 0.36 | 0.13 | procedure (3) |
-| manuals | 10 | 0.06 | 0.10 | 0.07 | procedure (4) |
-| logbookentry | 2 | 0.00 | 0.00 | 0.00 | humanfactors (1) |
+| humanfactors | 3371 | 0.64 | 0.76 | 0.69 | aircraft (307) |
+| aircraft | 3309 | 0.81 | 0.86 | 0.84 | humanfactors (235) |
+| procedure | 967 | 0.32 | 0.15 | 0.20 | humanfactors (536) |
+| ambiguous | 796 | 0.41 | 0.24 | 0.30 | humanfactors (331) |
+| weather | 329 | 0.57 | 0.67 | 0.62 | aircraft (45) |
+| airport | 244 | 0.52 | 0.45 | 0.48 | humanfactors (78) |
+| environment-nonweatherrelated | 238 | 0.27 | 0.10 | 0.14 | humanfactors (90) |
+| chartorpublication | 134 | 0.43 | 0.63 | 0.51 | procedure (15) |
+| airspacestructure | 129 | 0.43 | 0.22 | 0.30 | humanfactors (70) |
+| atcequipment/navfacility/buildings | 126 | 0.42 | 0.39 | 0.40 | ambiguous (25) |
+| softwareandautomation | 68 | 0.00 | 0.00 | 0.00 | humanfactors (18) |
+| companypolicy | 53 | 0.09 | 0.15 | 0.11 | humanfactors (16) |
+| equipment/tooling | 38 | 0.11 | 0.16 | 0.13 | humanfactors (19) |
+| mel | 24 | 0.18 | 0.42 | 0.25 | aircraft (8) |
+| incorrect/notinstalled/unavailablepart | 19 | 0.09 | 0.32 | 0.13 | humanfactors (6) |
+| staffing | 11 | 0.09 | 0.45 | 0.15 | humanfactors (4) |
+| manuals | 10 | 0.17 | 0.10 | 0.12 | humanfactors (3) |
+| logbookentry | 2 | 0.00 | 0.00 | 0.00 | humanfactors (2) |
 
 ## Confusion matrix: packaged model
 
@@ -52,24 +52,24 @@ Each row is a true class; each cell is the percent of that class predicted as th
 
 | true class \ predicted | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 0 aircraft (n=3309) | **80** |  |  | 2 | 1 |  | 1 | 1 | 1 | 8 |  |  |  | 1 | 2 |  |  | 2 |
-| 1 airport (n=244) | 6 | **35** | 1 | 2 | 2 | 7 | 2 | 3 |  | 27 |  |  |  |  | 9 |  |  | 5 |
-| 2 airspacestructure (n=129) | 1 | 1 | **41** | 2 | 2 | 3 |  | 3 |  | 33 |  |  |  |  | 13 | 1 |  | 1 |
-| 3 ambiguous (n=796) | 12 | 2 | 4 | **18** | 3 | 2 | 3 | 6 | 1 | 29 | 1 |  |  |  | 11 | 1 |  | 8 |
-| 4 atcequipment/navfacility/buildings (n=126) | 3 | 4 | 3 | 13 | **33** | 5 | 5 | 17 |  | 6 |  |  |  |  | 3 | 2 | 4 | 2 |
-| 5 chartorpublication (n=134) | 3 | 10 | 4 | 1 | 1 | **55** |  | 1 |  | 5 | 1 |  | 1 |  | 12 | 3 |  | 2 |
-| 6 companypolicy (n=53) | 8 |  | 4 | 2 |  | 6 | **28** | 2 | 2 | 15 |  |  |  | 2 | 13 |  | 11 | 8 |
-| 7 environment-nonweatherrelated (n=238) | 3 | 3 | 3 | 16 | 7 | 1 | 5 | **20** |  | 25 |  |  |  |  | 8 |  | 4 | 5 |
-| 8 equipment/tooling (n=38) | 13 |  |  | 3 | 8 |  | 3 | 3 | **26** | 29 | 8 |  |  |  | 8 |  |  |  |
-| 9 humanfactors (n=3371) | 11 | 2 | 3 | 4 | 2 | 1 | 2 | 1 | 1 | **56** | 1 |  |  | 1 | 11 |  |  | 4 |
-| 10 incorrect/notinstalled/unavailablepart (n=19) | 26 |  |  |  |  |  | 11 |  |  | 21 | **21** | 5 | 5 |  | 11 |  |  |  |
-| 11 logbookentry (n=2) |  |  |  |  |  |  |  |  |  | 50 |  |  |  | 50 |  |  |  |  |
-| 12 manuals (n=10) | 20 |  |  |  |  |  | 20 |  |  |  | 10 |  | **10** |  | 40 |  |  |  |
-| 13 mel (n=24) | 33 |  |  |  |  |  | 4 |  |  |  |  | 4 |  | **46** | 12 |  |  |  |
-| 14 procedure (n=967) | 11 | 1 | 6 | 3 | 2 | 2 | 3 | 2 | 2 | 40 | 1 | 1 |  | 2 | **20** |  | 1 | 2 |
-| 15 softwareandautomation (n=68) | 13 |  | 6 | 12 | 10 | 16 |  | 4 |  | 19 | 3 |  |  |  | 10 | **4** |  | 1 |
-| 16 staffing (n=11) |  |  |  |  |  |  | 18 |  |  | 18 |  |  |  |  | 27 |  | **36** |  |
-| 17 weather (n=329) | 8 | 2 | 2 | 1 |  |  |  | 2 |  | 10 |  |  |  |  | 1 |  | 1 | **75** |
+| 0 aircraft (n=3309) | **86** |  |  | 2 |  |  |  | 1 |  | 7 | 1 |  |  |  | 1 |  |  | 1 |
+| 1 airport (n=244) | 6 | **45** |  | 1 | 2 | 3 | 1 | 1 | 1 | 32 |  |  |  |  | 2 |  |  | 4 |
+| 2 airspacestructure (n=129) | 2 | 1 | **22** | 2 | 1 | 2 |  |  |  | 54 |  |  |  |  | 12 |  | 2 | 1 |
+| 3 ambiguous (n=796) | 14 | 3 | 1 | **24** | 1 | 2 | 2 | 2 | 1 | 42 |  |  |  |  | 5 |  |  | 4 |
+| 4 atcequipment/navfacility/buildings (n=126) | 7 | 7 | 2 | 20 | **39** | 5 | 1 | 10 | 1 | 6 |  |  |  |  | 2 |  | 1 | 1 |
+| 5 chartorpublication (n=134) | 2 | 10 | 1 | 1 | 1 | **63** |  |  |  | 10 |  |  |  |  | 11 |  |  | 1 |
+| 6 companypolicy (n=53) | 8 |  |  | 2 |  | 4 | **15** | 2 | 2 | 30 | 2 |  | 2 | 2 | 13 |  | 13 | 6 |
+| 7 environment-nonweatherrelated (n=238) | 7 | 4 |  | 22 | 2 | 1 | 3 | **10** | 1 | 38 |  |  |  |  | 6 |  | 4 | 1 |
+| 8 equipment/tooling (n=38) | 13 | 8 |  | 3 | 3 |  |  |  | **16** | 50 | 3 |  | 3 |  | 3 |  |  |  |
+| 9 humanfactors (n=3371) | 9 | 1 |  | 2 |  | 1 | 1 |  |  | **76** | 1 |  |  |  | 5 |  |  | 2 |
+| 10 incorrect/notinstalled/unavailablepart (n=19) | 21 |  |  |  |  |  | 5 |  |  | 32 | **32** | 5 |  | 5 |  |  |  |  |
+| 11 logbookentry (n=2) |  |  |  |  |  |  |  |  |  | 100 |  |  |  |  |  |  |  |  |
+| 12 manuals (n=10) | 10 |  |  |  |  |  | 10 |  |  | 30 | 20 |  | **10** |  | 20 |  |  |  |
+| 13 mel (n=24) | 33 |  |  |  |  |  |  |  |  | 21 |  | 4 |  | **42** |  |  |  |  |
+| 14 procedure (n=967) | 11 | 1 | 2 | 4 | 1 | 2 | 1 |  | 1 | 55 | 2 |  |  | 1 | **15** |  | 1 | 2 |
+| 15 softwareandautomation (n=68) | 15 |  |  | 21 | 1 | 24 | 3 | 3 |  | 26 | 1 | 1 |  |  | 1 |  |  | 3 |
+| 16 staffing (n=11) |  |  |  |  |  |  |  | 9 |  | 36 |  |  |  |  | 9 |  | **45** |  |
+| 17 weather (n=329) | 14 | 2 |  | 3 |  |  |  |  |  | 13 |  |  |  |  | 1 |  | 1 | **67** |
 
 Column key: 0 = aircraft; 1 = airport; 2 = airspacestructure; 3 = ambiguous; 4 = atcequipment/navfacility/buildings; 5 = chartorpublication; 6 = companypolicy; 7 = environment-nonweatherrelated; 8 = equipment/tooling; 9 = humanfactors; 10 = incorrect/notinstalled/unavailablepart; 11 = logbookentry; 12 = manuals; 13 = mel; 14 = procedure; 15 = softwareandautomation; 16 = staffing; 17 = weather.
 
@@ -77,6 +77,4 @@ Column key: 0 = aircraft; 1 = airport; 2 = airspacestructure; 3 = ambiguous; 4 =
 
 | backend | size (MB) | batch-1 median (ms) | batch-1 p95 (ms) | batch-32 (ms/report) |
 | --- | ---: | ---: | ---: | ---: |
-| torch | 44.7 | 15.7 | 32.5 | 28.75 |
-| onnx | 44.8 | 11.4 | 21.9 | 20.72 |
-| onnx_int8 | 11.4 | 7.7 | 17.8 | 12.00 |
+| torch | 44.7 | 14.9 | 29.8 | 20.72 |

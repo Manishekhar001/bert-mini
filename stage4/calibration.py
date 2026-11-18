@@ -1,4 +1,4 @@
-"""Calibration, abstention threshold and out-of-domain scores for one softmax classifier."""
+"""Calibration, class-mix correction and review cutoff for one softmax classifier."""
 from __future__ import annotations
 
 import numpy as np
@@ -57,21 +57,6 @@ def threshold_for_accuracy(confidence, correct, target: float = 0.9):
         return None, 0.0, float(running_accuracy.max())
     index = int(possible.max())
     return float(conf[index]), float((index + 1) / len(conf)), float(running_accuracy[index])
-
-
-def domain_score(kind: str, logits, probabilities):
-    """One score per report: max probability or log-sum-exp of raw logits.
-
-    For both choices higher is interpreted as more familiar/in-domain by this project's convention.
-    """
-    logits = np.asarray(logits, dtype=np.float64)
-    probabilities = np.asarray(probabilities, dtype=np.float64)
-    if kind == "confidence":
-        return probabilities.max(axis=1)
-    if kind == "energy":
-        maximum = logits.max(axis=1, keepdims=True)
-        return (maximum[:, 0] + np.log(np.exp(logits - maximum).sum(axis=1)))
-    raise ValueError(f"unknown domain score {kind!r}")
 
 
 def apply_bias(logits, bias):

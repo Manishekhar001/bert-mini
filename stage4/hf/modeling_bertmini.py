@@ -6,7 +6,7 @@
     model.classify(["narrative text ..."], tokenizer)
 
 `classify` repeats the project's own pipeline: head + tail truncation, the per-class prior correction, temperature
-scaling, and the review / out-of-domain flags. Plain `model(input_ids, attention_mask).logits` returns raw scores.
+scaling, and the review flag. Plain `model(input_ids, attention_mask).logits` returns raw scores.
 """
 import torch
 import torch.nn as nn
@@ -95,7 +95,6 @@ class BertMiniForSequenceClassification(PreTrainedModel):
         bias = torch.tensor(cfg.class_bias, dtype=torch.float64) if cfg.class_bias else None
         temperature = float(cfg.calibration_temperature)
         cutoff = cfg.confidence_threshold
-        ood = cfg.ood
         pad_id = tokenizer.pad_token_id or 0
         order = sorted(range(len(sequences)), key=lambda i: len(sequences[i]))
         results = [None] * len(sequences)
@@ -118,15 +117,9 @@ class BertMiniForSequenceClassification(PreTrainedModel):
                 reasons = []
                 if cutoff is None or confidence < float(cutoff):
                     reasons.append("low_confidence")
-                is_ood = False
-                if ood:
-                    score = confidence if ood["score"] == "confidence" else float(torch.logsumexp(logits[row], dim=-1))
-                    is_ood = score < float(ood["threshold"])
-                    if is_ood:
-                        reasons.append("out_of_domain")
                 results[i] = {
                     "label": cfg.id2label[best], "label_id": best, "confidence": confidence,
                     "probabilities": {cfg.id2label[j]: float(p[j]) for j in range(len(p))},
-                    "needs_review": bool(reasons), "review_reasons": reasons, "out_of_domain": is_ood,
+                    "needs_review": bool(reasons), "review_reasons": reasons,
                 }
         return results

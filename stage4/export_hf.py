@@ -83,7 +83,6 @@ Training data: `{dataset}`. Check its licence before relying on or redistributin
   reached similar or higher raw accuracy than this model, so treat it as a triage aid, not an authority.
 - Calibration helps: when the model says it is confident, it is closer to being right. The review flag is meant to
   route uncertain reports to a person.
-- The out-of-domain flag is a weak warning, not a guarantee; it was checked only against Wikipedia text.
 - Not for operational or safety-critical decisions.
 """
 
@@ -144,7 +143,7 @@ def main():
         pooling=source.pooling, report_max_len=data_cfg.get("max_len", 512),
         report_head_tokens=data_cfg.get("head_tokens", 384),
         calibration_temperature=cal.get("temperature", 1.0), class_bias=cal.get("class_bias"),
-        confidence_threshold=cal.get("confidence_threshold"), ood=cal.get("ood"),
+        confidence_threshold=cal.get("confidence_threshold"),
         id2label=dict(enumerate(schema.classes)), label2id={name: i for i, name in enumerate(schema.classes)},
         architectures=["BertMiniForSequenceClassification"],
     )

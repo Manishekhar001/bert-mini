@@ -10,7 +10,7 @@ import streamlit as st
 
 from stage4.inference import Predictor
 
-MODEL_DIR = os.environ.get("BERTMINI_DIR", "artifacts/final")
+MODEL_DIR = os.environ.get("BERTMINI_DIR", "artifacts/final_pretrained")
 BACKEND = os.environ.get("BERTMINI_BACKEND", "onnx_int8")
 
 st.set_page_config(page_title="bert-mini: ASRS triage", layout="wide")
