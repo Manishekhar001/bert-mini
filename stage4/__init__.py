@@ -1,1 +1,1 @@
-"""Mini Jev project stage package."""
+"""bert-mini stage 4 package."""

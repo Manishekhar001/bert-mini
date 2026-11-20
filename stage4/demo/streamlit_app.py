@@ -10,7 +10,8 @@ import streamlit as st
 
 from stage4.inference import Predictor
 
-MODEL_DIR = os.environ.get("BERTMINI_DIR", "artifacts/final_pretrained")
+HF_REPO = os.environ.get("BERTMINI_HF_REPO")        # e.g. yourname/mini-bert-asrs (set on Render)
+LOCAL_DIR = os.environ.get("BERTMINI_DIR", "artifacts/final_pretrained")
 BACKEND = os.environ.get("BERTMINI_BACKEND", "onnx_int8")
 
 st.set_page_config(page_title="bert-mini: ASRS triage", layout="wide")
@@ -19,13 +20,34 @@ st.caption("A distilled BERT-mini chooses one of the dataset's 18 report categor
            "Not for real safety decisions.")
 
 
+@st.cache_resource(show_spinner="Downloading model...")
+def model_dir() -> str:
+    """Local package folder, or the onnx/ folder of the Hugging Face repo when BERTMINI_HF_REPO is set."""
+    if not HF_REPO:
+        return LOCAL_DIR
+    from huggingface_hub import snapshot_download
+
+    root = snapshot_download(HF_REPO, allow_patterns=["onnx/*"], token=os.environ.get("HF_TOKEN") or None)
+    return str(Path(root) / "onnx")
+
+
+def available_backends(directory: str) -> list[str]:
+    files = {"onnx_int8": "model.int8.onnx", "onnx": "model.onnx", "torch": "model.pt"}
+    return [name for name, file in files.items() if (Path(directory) / file).exists()]
+
+
 @st.cache_resource
-def load(backend: str):
-    return Predictor(MODEL_DIR, backend)
+def load(directory: str, backend: str):
+    return Predictor(directory, backend)
 
 
-backend = st.sidebar.selectbox("Backend", ["onnx_int8", "onnx", "torch"], index=["onnx_int8", "onnx", "torch"].index(BACKEND))
-predictor = load(backend)
+directory = model_dir()
+options = available_backends(directory)
+if not options:
+    st.error(f"No model files found in {directory}.")
+    st.stop()
+backend = st.sidebar.selectbox("Backend", options, index=options.index(BACKEND) if BACKEND in options else 0)
+predictor = load(directory, backend)
 text = st.text_area("Report narrative", height=220, placeholder="Paste an ASRS-style narrative here...")
 
 if st.button("Analyse", type="primary") and text.strip():

@@ -227,7 +227,7 @@ The response includes the chosen category, its confidence, probabilities for all
 uv run streamlit run stage4/demo/streamlit_app.py
 ```
 
-The service looks for `artifacts/final` by default. To select another package or backend in PowerShell, set `BERTMINI_DIR` or `BERTMINI_BACKEND` before starting it. Backends are `torch`, `onnx`, and `onnx_int8`.
+The service looks for `artifacts/final_pretrained` by default. To select another package or backend in PowerShell, set `BERTMINI_DIR` or `BERTMINI_BACKEND` before starting it. Backends are `torch`, `onnx`, and `onnx_int8`.
 
 ## 8. Export to Hugging Face format and publish
 
